@@ -1,5 +1,5 @@
 # encoding=utf-8
-from flask import Flask, request, abort, jsonify, Resource
+from flask import Flask, request, abort, jsonify
 
 from linebot import (
     LineBotApi, WebhookHandler
@@ -21,9 +21,13 @@ import requests
 import pymysql
 import requests
 import jieba
+from controller import blueprint
+from model import DBSession
+from model.userInfo import userinfo
 
 jieba.load_userdict("sc-dictionary/main.txt")
-app = Flask(__name__)
+
+db = DBSession()
 
 line_bot_api = LineBotApi('Rh6P7TDiSyGq3GhWWjg+KlHuN5GzsIsYKDX9qQkzdcAi0TbMKXITpoeDk8Ra0oPIx0kg21gconwSHPqMJpa/q6s2DQAMHWZwawJ3nbd0lL3SCWk3xWJs/tAHOlDjgL1GB1ZT6EPpcFHDlmNGjvYXSwdB04t89/1O/w1cDnyilFU=')
 
@@ -33,7 +37,7 @@ def connectToSql():
     sql = pymysql.connect("localhost","ubuntu","hellohello","chatbot")
     return sql
 
-@app.route("/callback", methods=['POST'])
+@blueprint.route("/callback", methods=['POST'])
 def callback():
         # get X-Line-Signature header value
         signature = request.headers['X-Line-Signature']
@@ -50,27 +54,6 @@ def callback():
 
         return 'OK'
 
-@app.route("/controlNLP", methods=['POST'])
-def controlNLP():
-    intentsOpen = ["開","打開","開啟"]
-    intentsClose = ["關","關掉","關閉"]
-    intents_1 = ["開燈","關燈","燈","電燈","LED","冷氣","空氣清淨機","電視","門"]
-    userIntent = request.get_json()
-    # print(userIntent['userIntent'])
-    userIntent = jieba.cut_for_search(userIntent["userIntent"])
-
-    intent = ""
-
-    for word in userIntent:
-        print(word)
-        if word in intentsOpen:
-            intent += "開"
-        elif word in intentsClose:
-            intent += "關"
-        elif word in intents_1:
-            intent += word
-
-    return jsonify({"userIntent":intent})
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
@@ -86,10 +69,11 @@ def handle_message(event):
         )
 
     elif event.message.text == "godfrey8581":
-        sql= connectToSql()
-        cur = sql.cursor()
-        cur.execute("SELECT user_id FROM userinfo")
-        user_ids = cur.fetchall()
+        # sql= connectToSql()
+        # cur = sql.cursor()
+        # cur.execute("SELECT user_id FROM userinfo")
+        # user_ids = cur.fetchall()
+        user_ids = db.query(USERINFO.user_id).all()
 
         for user_id in user_ids:
             line_bot_api.push_message(user_id[0], TextSendMessage(text="WWWW"))
@@ -129,5 +113,24 @@ def reply_text_and_get_user_profile(event):
 
     line_bot_api.push_message(user_profile.user_id,TextSendMessage(text='Hello'))
 
-# if __name__ == "__main__":
-#     app.run(host="0.0.0.0", port=80)
+@blueprint.route("/controlNLP", methods=['POST'])
+def controlNLP():
+    intentsOpen = ["開","打開","開啟"]
+    intentsClose = ["關","關掉","關閉"]
+    intents_1 = ["開燈","關燈","燈","電燈","LED","冷氣","空氣清淨機","電視","門"]
+    userIntent = request.get_json()
+    # print(userIntent['userIntent'])
+    userIntent = jieba.cut_for_search(userIntent["userIntent"])
+
+    intent = ""
+
+    for word in userIntent:
+        print(word)
+        if word in intentsOpen:
+            intent += "開"
+        elif word in intentsClose:
+            intent += "關"
+        elif word in intents_1:
+            intent += word
+
+    return intent
