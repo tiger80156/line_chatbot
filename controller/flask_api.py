@@ -1,5 +1,5 @@
 # encoding=utf-8
-from flask import Flask, request, abort, jsonify
+from flask import Flask, request, abort, jsonify, Resource
 
 from linebot import (
     LineBotApi, WebhookHandler
@@ -129,5 +129,5 @@ def reply_text_and_get_user_profile(event):
 
     line_bot_api.push_message(user_profile.user_id,TextSendMessage(text='Hello'))
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=80)
+# if __name__ == "__main__":
+#     app.run(host="0.0.0.0", port=80)
