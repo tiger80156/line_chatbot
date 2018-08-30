@@ -4,14 +4,14 @@ from . import Base
 # User information table
 class userinfo(Base):
     __tablename__ = "userinfo"
-    date = Column(Date)
+    follow_date = Column(Date)
     displayname = Column(String(255))
     picture_url = Column(String(255))
     status_message = Column(String(255))
     user_id = Column(String(255), primary_key = True)
 
-    def __init__(date,self,displayname, picture_url, status_message, user_id):
-        self.date = date
+    def __init__(self,follow_date,displayname, picture_url, status_message, user_id):
+        self.follow_date = follow_date
         self.displayname = displayname
         self.picture_url = picture_url
         self.status_message = status_message
@@ -22,5 +22,6 @@ class userinfo(Base):
             self.displayname,
             self.picture_url,
             self.status_message,
-            self.user_id
+            self.user_id,
+            self.follow_date
         )

@@ -6,7 +6,7 @@ source activate gaston
 ```
 成功啟動環境後會發現環境成功切換，此部份用來安裝新套件
 
-## 啟動linebot
+## 啟動 linebot
 ```
 sudo ~/anaconda3/envs/gaston/bin/python app.py
 ```

@@ -33,7 +33,7 @@ import requests
 import jieba
 from model import DBSession
 from model.userInfo import userinfo
-import os
+from time import gmtime, strftime
 
 # The traditional chinese dictionary for cut word
 # jieba.load_userdict("sc-dictionary/main.txt")
@@ -141,14 +141,14 @@ def reply_text_and_get_user_profile(event):
 
     # 取出消息內User的資料
     user_profile = line_bot_api.get_profile(event.source.user_id)
-    date = os.system("date %D")
+    date = strftime("%Y-%m-%d", gmtime())
 
     db = DBSession()
     userIds = db.query(userinfo.user_id).all()
 
     if userIds == []:
         db = DBSession()
-        user = userinfo(date,user_profile.display_name, user_profile.picture_url,user_profile.status_message, user_profile.user_id)
+        user = userinfo(date ,user_profile.display_name, user_profile.picture_url,user_profile.status_message, user_profile.user_id)
         db.add(user)
     db.commit()
     db.close()
@@ -157,7 +157,6 @@ def reply_text_and_get_user_profile(event):
 
 @handler.add(UnfollowEvent)
 def user_unfollow_delete_userInfo(event):
-
     connection = pymysql.connect(host='localhost',
                     user='root',
                     password='hellohello',
