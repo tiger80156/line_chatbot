@@ -85,7 +85,7 @@ def controlNLP():
             intent += "關"
         elif word in intents_1:
             intent += word
-    if intent == "":
+    if intent:
         return userIntent['userIntent']
     else:
         return intent
